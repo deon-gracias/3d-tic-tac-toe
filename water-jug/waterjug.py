@@ -1,5 +1,6 @@
 def bfs(start, end, x_capacity, y_capacity):
 	path = []
+
 	front = []
 	front.append(start)
 	visited = []
