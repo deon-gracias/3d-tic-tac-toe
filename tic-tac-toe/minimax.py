@@ -1,13 +1,7 @@
 import random
 
-class Node:
-    def __init__(self, board, player, moves):
-        self.board = board
-        self.player = player
-        self.moves = moves
 
-
-class TicTacToe2d:
+class TicTacToeMiniMax:
     # " char list containing X and O "
     board = []
 
@@ -27,6 +21,7 @@ class TicTacToe2d:
         ]
 
         for i in range(1000):
+            # if game is over
             self.round = i
             # print(i)
             if i % 2 == 0:
@@ -54,10 +49,10 @@ class TicTacToe2d:
         ip = (input("Choose a position (0-8):"))
         # for simplicity assume user is x and runs first
         # self.board[ip] = 'X'
-        while (ip.isdigit()==False) or (int(ip) in self.usedSquarePosition) or (int(ip)>8):
+        while (ip.isdigit() == False) or (int(ip) in self.usedSquarePosition) or (int(ip) > 8):
             print("Invalid input")
             ip = (input("Choose a position (0-8):"))
-        
+
         ip = int(ip)
         self.board[ip] = 'X'
         self.usedSquarePosition.append(ip)
@@ -75,53 +70,93 @@ class TicTacToe2d:
                 print(self.board[i], end=' ')
                 if i % 3 == 2:
                     print("|")
-                
+
         # print("\n")
         print("=========")
 
+    def gamer(self):
+        isOver = False
+        while not isOver:
+            if self.score() != 200:
+                sc = self.score()
+                return sc
+
+            else:
+                pass
+
+        pass
+
+    # this is to model real life scenarios
+    def score(self):
+        # if player wins, then  negative marking
+        if self.hasWon('X'):
+            return -10
+
+        # highest score when we as CPU wins the game
+        elif self.hasWon('O'):
+            return 10
+
+        elif self.isGameOver():
+            return 0
+        # if nobody wins no points
+        else:
+            return 200
+
     def computer_input(self):
         print("Computer's turn !!")
-        node = Node(self.board, 'O', self.get_available_moves())
-        move = self.minimax(node)
-        self.board[move] = 'O'
-        self.usedSquarePosition.append(move)
-        self.positionsByCpu.append(move)
-        self.display_board()
+        if self.round <= 3:
+            print("Computer is thinking")
+            if self.round == 3:
+                i = self.get_blocking_move()
+                if i == -404:
+                    i = self.think()
+                    #
+                    if i == -404:
+                        for i in [0, 2, 6, 8]:
+                            if i not in self.usedSquarePosition:
+                                return i
 
-    def minimax(self, node):
-        if self.hasWon('X'):
-            return -1
+            else:
+                i = self.think()
 
-        if self.hasWon('O'):
-            return 1
-
-        if len(node.moves) == 0:
-            return 0
-
-        scores = []
-        for move in node.moves:
-            new_board = node.board.copy()
-            new_board[move] = node.player
-            new_player = 'X' if node.player == 'O' else 'O'
-            new_moves = self.get_available_moves(new_board)
-
-            new_node = Node(new_board, new_player, new_moves)
-            score = self.minimax(new_node)
-            scores.append(score)
-
-        if node.player == 'O':
-            max_score = max(scores)
-            return node.moves[scores.index(max_score)]
+            # i = self.think()
+            # i = random.randint(0, 8)
+            # while i in self.usedSquarePosition:
+            #     i = random.randint(0, 8)
+            self.board[i] = 'O'
+            self.usedSquarePosition.append(i)
+            self.positionsByCpu.append(i)
         else:
-            min_score = min(scores)
-            return node.moves[scores.index(min_score)]
-        
-    def get_available_moves(self, board=None):
-        if board is None:
-            board = self.board
+            move = self.get_winning_move()
+            # TODO land here for debuggin winning move
+            # print(f"here and move {move}")
 
-        return [i for i, x in enumerate(board) if x == '_']
+            # print(move)
+            # win if you can
+            if move != -404:
+                self.board[move] = 'O'
+                self.usedSquarePosition.append(move)
+                self.positionsByCpu.append(move)
 
+            #     otherwise block that person from winning
+            else:
+
+                b = self.get_blocking_move()
+
+                if b != -404:
+                    self.board[b] = 'O'
+                    self.usedSquarePosition.append(b)
+                    self.positionsByCpu.append(b)
+                else:
+                    i = random.randint(0, 8)
+                    while i in self.usedSquarePosition:
+                        i = random.randint(0, 8)
+                    self.board[i] = 'O'
+                    self.usedSquarePosition.append(i)
+                    self.positionsByCpu.append(i)
+
+        print()
+        self.display_board()
 
     def get_blocking_move(self):
         for j in self.positionsByHuman:
@@ -167,4 +202,4 @@ class TicTacToe2d:
 
 
 if __name__ == "__main__":
-    TicTacToe2d()
+    TicTacToeMiniMax()

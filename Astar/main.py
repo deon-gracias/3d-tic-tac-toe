@@ -50,7 +50,6 @@ class Node:
                 if puz[i][j] == x:
                     return i, j
 
-
 class Puzzle:
     def __init__(self, size):
         """ Initialize the puzzle size by the specified size,open and closed lists to empty """
